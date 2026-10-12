@@ -1,6 +1,6 @@
 import { MCPServer } from "mcp-use";
 import { z } from "zod";
-import { audit, normalise } from "./src/rules.js";
+import { audit, normalise, CATEGORY_SEVERITY, SCORE_GUIDE, verdictFor } from "./src/rules.js";
 
 const server = new MCPServer({
   name: "truequill",
@@ -75,14 +75,18 @@ const categorySchema = z.object({
   name: z.string().describe("Category key"),
   matched: z.boolean().describe("True when this category fired"),
   matches: z.array(z.string()).describe("Flagged phrases for this category"),
+  severity: z.enum(["strong", "weak", "check-worthy"]).describe("Signal strength: strong AI tell, weak style signal, or worth checking"),
+  points: z.number().describe("Score points this category cost (1 when matched, 0 when clear)"),
 });
 
 const checkTextOutputSchema = z.object({
   score: z.number().min(0).max(5).nullable().describe("Score out of 5, or null when capped"),
   maxScore: z.number().describe("Always 5"),
-  categories: z.array(categorySchema).describe("Per-category hits"),
+  categories: z.array(categorySchema).describe("Per-category hits with severity and point contribution"),
   capped: z.boolean().describe("True when the daily cap was hit"),
   upgradeUrl: z.string().optional().describe("Upgrade URL, present when capped"),
+  verdict: z.string().describe("Plain-language overall verdict"),
+  scoreGuide: z.string().describe("What the score ranges mean"),
 });
 
 export const checkText = server.tool(
@@ -116,9 +120,11 @@ export const checkText = server.tool(
       const data = {
         score: null as number | null,
         maxScore: 5,
-        categories: [] as Array<{ name: string; matched: boolean; matches: string[] }>,
+        categories: [] as Array<{ name: string; matched: boolean; matches: string[]; severity: "strong" | "weak" | "check-worthy"; points: number }>,
         capped: true,
         upgradeUrl: UPGRADE_URL,
+        verdict: "Daily limit reached — upgrade to Pro for unlimited checks.",
+        scoreGuide: SCORE_GUIDE,
       };
       return {
         content: [
@@ -132,21 +138,30 @@ export const checkText = server.tool(
     }
     recordUse(key);
     const result = audit(normalise(text));
+    const withSeverity = result.categories.map((c) => ({
+      name: c.name,
+      matched: c.matched,
+      matches: c.matches,
+      severity: CATEGORY_SEVERITY[c.name],
+      points: c.matched ? 1 : 0,
+    }));
+    const verdict = verdictFor(
+      result.score,
+      withSeverity.some((c) => c.matched && c.severity === "strong")
+    );
     const data = {
       score: result.score,
       maxScore: 5 as number,
-      categories: result.categories.map((c) => ({
-        name: c.name,
-        matched: c.matched,
-        matches: c.matches,
-      })),
+      categories: withSeverity,
       capped: false,
+      verdict,
+      scoreGuide: SCORE_GUIDE,
     };
     const failed = result.categories.filter((c) => c.matched).map((c) => c.name);
     const summary =
       result.score === 5
-        ? "TrueQuill: 5/5 CLEAN — no AI tells found."
-        : `TrueQuill: ${result.score}/5 — flagged: ${failed.join(", ") || "none"}.`;
+        ? `TrueQuill: 5/5 CLEAN. ${verdict}`
+        : `TrueQuill: ${result.score}/5 — flagged: ${failed.join(", ") || "none"}. ${verdict}`;
     return {
       content: [{ type: "text" as const, text: summary }],
       structuredContent: data,

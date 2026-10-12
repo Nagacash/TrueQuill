@@ -103,6 +103,15 @@
   letter-spacing: 0.06em;
   opacity: 0.6;
 }
+.tq-cat-sev {
+  font-size: 11px;
+  opacity: 0.5;
+}
+.tq-verdict {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
 .tq-draft {
   font-size: 13px;
   line-height: 1.5;

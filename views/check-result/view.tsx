@@ -119,6 +119,7 @@ export default function CheckResult() {
   const score = output.score;
   const categories = output.categories ?? [];
   const upgradeUrl = output.upgradeUrl ?? PRO_URL;
+  const verdict = typeof output.verdict === "string" ? output.verdict : "";
 
   const needles = useMemo(() => {
     const list: string[] = [];
@@ -135,7 +136,7 @@ export default function CheckResult() {
   return (
     <ThemeProvider>
       <div className="tq-card">
-        {!capped && <ModelContext content={`TrueQuill score: ${score}/5${categories.filter((c) => c.matched).map((c) => `; flagged ${c.name}`).join("")}`} />}
+        {!capped && <ModelContext content={`TrueQuill score: ${score}/5${categories.filter((c) => c.matched).map((c) => `; flagged ${c.name} (${c.severity ?? "unknown"} signal)`).join("")}. Verdict: ${verdict}`} />}
         {capped && <ModelContext content="TrueQuill daily cap reached; user should upgrade to Pro." />}
         <div className="tq-head">
           <span className="tq-brand">
@@ -187,10 +188,12 @@ export default function CheckResult() {
                 <li key={c.name} className={c.matched ? "tq-cat hit" : "tq-cat"}>
                   <span className="tq-dot" aria-hidden />
                   <span className="tq-cat-name">{CATEGORY_LABELS[c.name] ?? c.name}</span>
-                  <span className="tq-cat-state">{c.matched ? "flagged" : "clear"}</span>
+                  <span className="tq-cat-sev">{c.severity === "strong" ? "strong signal" : c.severity === "weak" ? "weak signal" : c.severity === "check-worthy" ? "check-worthy" : ""}</span>
+                  <span className="tq-cat-state">{c.matched ? "flagged −1 pt" : "clear"}</span>
                 </li>
               ))}
             </ul>
+            {verdict && <p className="tq-verdict">{verdict}</p>}
             {draft && <HighlightedDraft text={draft} needles={needles} />}
             {categories.some((c) => c.matched) && (
               <ul className="tq-matches">

@@ -115,13 +115,34 @@ export interface AuditResult {
   maxScore: 5;
 }
 
-export const CATEGORY_META: Record<CategoryKey, { title: string; hint: string }> = {
-  vocabulary: { title: "AI vocabulary", hint: "Overused model word choices" },
-  "sentence-patterns": { title: "AI constructions", hint: "Stock sentence moves" },
-  punctuation: { title: "Punctuation cadence", hint: "Em-dash / compound / semicolon density" },
-  "three-item-lists": { title: "Rule-of-three rhythm", hint: "Tricolon list reflex" },
-  "unsupported-proof": { title: "Possible invented proof", hint: "Unverifiable social-proof numbers" },
+export type Severity = "strong" | "weak" | "check-worthy";
+
+export const CATEGORY_SEVERITY: Record<CategoryKey, Severity> = {
+  // Strong signals: stock model word choices and constructions.
+  vocabulary: "strong",
+  "sentence-patterns": "strong",
+  // Weak signals: ordinary professional-writing habits, editing advice
+  // rather than evidence of AI authorship.
+  punctuation: "weak",
+  "three-item-lists": "weak",
+  // Worth checking, but a regex cannot judge whether a number is real.
+  "unsupported-proof": "check-worthy",
 };
+
+export const SCORE_GUIDE =
+  "5 = clean, 4 = one tell, 3 = two tells, 2 or less = heavy AI resemblance. " +
+  "Each flagged category costs 1 point. Vocabulary and sentence-patterns are " +
+  "strong AI signals; punctuation and three-item-lists are weak style signals; " +
+  "unsupported-proof is worth checking but may be a real, defensible claim.";
+
+export function verdictFor(score: number, strongHit: boolean): string {
+  if (score === 5) return "No AI tells found — reads human.";
+  if (!strongHit)
+    return "Only weak style signals flagged — resembles ordinary professional writing more than AI generation.";
+  if (score === 4) return "Mostly clean — one AI tell worth a second look.";
+  if (score === 3) return "Mixed signals — two AI tells flagged, consider a rewrite pass.";
+  return "Strong AI resemblance — rewrite recommended.";
+}
 
 export function audit(text: string): AuditResult {
   const low = text.toLowerCase();
