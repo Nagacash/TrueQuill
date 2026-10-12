@@ -130,10 +130,12 @@ export const CATEGORY_SEVERITY: Record<CategoryKey, Severity> = {
 };
 
 export const SCORE_GUIDE =
-  "5 = clean, 4 = one tell, 3 = two tells, 2 or less = heavy AI resemblance. " +
+  "5 = clean, 4 = one tell, 3 = two tells, 2 or less = three or more tells. " +
   "Each flagged category costs 1 point. Vocabulary and sentence-patterns are " +
-  "strong AI signals; punctuation and three-item-lists are weak style signals; " +
-  "unsupported-proof is worth checking but may be a real, defensible claim.";
+  "strong AI signals; punctuation and three-item-lists are weak style signals — " +
+  "a low score built mostly from weak signals does not mean heavy AI resemblance, " +
+  "read the verdict for the calibrated call. Unsupported-proof is worth checking " +
+  "but may be a real, defensible claim.";
 
 export function verdictFor(score: number, strongHit: boolean, strongCount = strongHit ? 1 : 0): string {
   if (score === 5) return "No AI tells found — reads human.";
