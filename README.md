@@ -1,58 +1,73 @@
-# TrueQuill — Check drafts for AI tells
+<p align="center">
+  <img src="public/logo.png" width="128" alt="TrueQuill cobra mark">
+</p>
 
-Free MCP server + ChatGPT widget that scores pasted text for AI-writing tells
-(5 categories, score out of 5), capped at 10 checks/day. Powered by
-[Naga Codex](https://www.nagacodex.cloud/).
+<h1 align="center">TrueQuill</h1>
 
-Rule logic is a TypeScript port of SlopMonster `tools/deslop.py` (repo upstream
-is still named SlopMonster; the product ships as TrueQuill). Rule tables live in
-one file — `src/rules.ts` — so updates mirror upstream easily.
+<p align="center">
+  Check a draft for AI tells before you send it.
+</p>
+
+<p align="center">
+  <a href="https://nagacodex.cloud">nagacodex.cloud</a>
+  &nbsp;·&nbsp;
+  Free MCP
+  &nbsp;·&nbsp;
+  Score out of 5
+</p>
+
+<p align="center">
+  <img src="public/social.png" width="880" alt="TrueQuill. Check drafts for AI tells.">
+</p>
+
+Paste a paragraph. TrueQuill returns a score from 0 to 5, the categories that fired, and a short note on each one. It does not rewrite the draft.
+
+The free server allows 10 checks per day. The cap is kept in memory, so a restart clears it. Pro is not live yet. When the cap is hit, `pro_info` points at [nagacodex.cloud/pro](https://nagacodex.cloud/pro), which is marked coming soon.
+
+## Connect
+
+| Client | How |
+| --- | --- |
+| ChatGPT | Settings, then Apps, then add the server URL |
+| Claude | Settings, then Connectors, then add the server URL |
+| Any MCP client | Add the URL below |
+
+```
+https://keen-spark-amvi2.run.mcp-use.com/mcp
+```
 
 ## Tools
 
-- `check_text(text)` → `{ score, maxScore: 5, categories, capped }`. Each
-  category with ≥1 match costs 1 point; 5/5 = clean; empty input is an error.
-  After 10 checks/day (per caller, UTC day) returns
-  `{ capped: true, score: null, upgradeUrl: "https://nagacodex.cloud/pro" }`.
-- `pro_info()` → static text: Pro adds unlimited checks, a cleanse second-pass,
-  and file/CI checks, plus the upgrade URL.
+| Tool | What it returns |
+| --- | --- |
+| `check_text` | Score out of 5, fired categories, and a note for each |
+| `pro_info` | The coming-soon Pro link, once the daily cap is reached |
 
-Rate limiting is a simple in-memory map in `index.ts` keyed by best-effort
-client-reported id. Production needs persistent storage + verified identity
-(OAuth); the map resets on restart/redeploy.
+Categories: vocabulary, sentence patterns, punctuation, three-item lists, unsupported proof.
 
-## Getting started
+A sentence such as “It’s not just a tool, it’s a game-changing journey.” scores 3 out of 5, on vocabulary and sentence patterns.
+
+The patterns are a port of [SlopMonster](https://github.com/Nagacash/SlopMonster) `patterns.py`.
+
+## Develop
+
+Requires Node 22.22.2 or newer.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open http://localhost:3000/mcp/inspector to test. Regression check:
+Inspector: [http://localhost:3000/mcp/inspector](http://localhost:3000/mcp/inspector)
 
 ```bash
-npx mcp-use client dev tools call check_text text="It's not just a tool, it's a game-changing journey."
-# → 3/5, vocabulary + sentence-patterns flagged
+npx -y mcp-use@latest call check_text --args '{"text":"It is not just a tool, it is a game-changing journey."}'
 ```
 
-Run `npm run typecheck` for types, `npm run build` for a production bundle.
-
-## Deploy (Manufact Cloud, no GitHub)
-
-Manufact CLI login is via `~/.mcp-use/config.json` (never print it).
+Deploy with the Manufact CLI:
 
 ```bash
 npx -y mcp-use@latest deploy --no-github -y --org org-6cc38bb8-vhnn2
 ```
 
-This uses a Manufact-managed repo (no GitHub push). To move the code into
-`github.com/Nagacash/TrueQuill` later, the owner pushes this folder there or
-provides a GitHub token, then redeploys via the GitHub-connect path.
-
-## Env vars
-
-None required for v1 (no OAuth, no external APIs, no analytics).
-
-## Submission pack
-
-See `SUBMISSION.md` for directory listing copy and test cases.
+No environment variables. See `SUBMISSION.md` for the ChatGPT listing fields.
