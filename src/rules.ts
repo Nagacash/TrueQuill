@@ -193,7 +193,10 @@ export function audit(text: string): AuditResult {
   }
 
   const punctMatches: string[] = [];
-  const sentences = text.split(/(?<=[.!?])\s+/);
+  // Newlines are sentence breaks. Pasted page copy stacks blurbs one per line;
+  // without this, two cards become one sentence and a single em dash on each
+  // card looks like a pile of dashes.
+  const sentences = text.split(/(?<=[.!?])\s+|\n+/);
   for (const s of sentences) {
     let flagged = false;
     for (let i = 0; i < Math.max(1, s.length); i += 220) {
@@ -239,7 +242,10 @@ export function audit(text: string): AuditResult {
   const proofMatches: string[] = [];
   const proofRe = new RegExp(PROOF_SOURCE, "gi");
   for (const m of text.matchAll(proofRe)) {
-    proofMatches.push(m[0].trim());
+    const hit = m[0].trim();
+    // "18+ podcast site" is a content rating, not "18 or more sites".
+    if (/^(?:1[3-9]|2[01])\+\s+\w+\s+sites?$/i.test(hit)) continue;
+    proofMatches.push(hit);
     if (proofMatches.length >= 8) break;
   }
 
