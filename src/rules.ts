@@ -135,13 +135,31 @@ export const SCORE_GUIDE =
   "strong AI signals; punctuation and three-item-lists are weak style signals; " +
   "unsupported-proof is worth checking but may be a real, defensible claim.";
 
-export function verdictFor(score: number, strongHit: boolean): string {
+export function verdictFor(score: number, strongHit: boolean, strongCount = strongHit ? 1 : 0): string {
   if (score === 5) return "No AI tells found — reads human.";
-  if (!strongHit)
+  if (strongCount === 0)
     return "Only weak style signals flagged — resembles ordinary professional writing more than AI generation.";
+  if (strongCount === 1)
+    return "Low-to-moderate AI resemblance. A formulaic pattern was detected, but the evidence is not conclusive.";
   if (score === 4) return "Mostly clean — one AI tell worth a second look.";
   if (score === 3) return "Mixed signals — two AI tells flagged, consider a rewrite pass.";
   return "Strong AI resemblance — rewrite recommended.";
+}
+
+export function confidenceFor(strongCount: number): "Low" | "Moderate" | "High" {
+  if (strongCount >= 2) return "High";
+  if (strongCount === 1) return "Moderate";
+  return "Low";
+}
+
+/** Display-only cleanup for flagged excerpts: a phrase match may reach across
+ * a full stop into the next sentence (e.g. "…sense. it"). Detection is
+ * untouched — this only trims the quoted text at the sentence boundary so the
+ * widget quotes a clean excerpt. */
+export function cleanExcerpt(match: string): string {
+  const cut = match.search(/[.][^.]*$/);
+  if (cut > 20) return match.slice(0, cut + 1).trim();
+  return match;
 }
 
 export function audit(text: string): AuditResult {
@@ -168,7 +186,7 @@ export function audit(text: string): AuditResult {
     const re = new RegExp(pat, "g");
     const found = low.match(re);
     if (found) {
-      for (const m of found.slice(0, 4)) phraseMatches.push(`${label}: \u201c${m.slice(0, 80)}\u201d`);
+      for (const m of found.slice(0, 4)) phraseMatches.push(`${label}: \u201c${cleanExcerpt(m).slice(0, 80)}\u201d`);
     }
   }
 

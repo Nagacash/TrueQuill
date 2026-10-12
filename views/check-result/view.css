@@ -110,6 +110,11 @@
 .tq-verdict {
   font-size: 13px;
   font-weight: 600;
+  margin: 0 0 4px;
+}
+.tq-conf {
+  font-size: 12px;
+  opacity: 0.75;
   margin: 0 0 8px;
 }
 .tq-draft {

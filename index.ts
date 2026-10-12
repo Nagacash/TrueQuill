@@ -1,6 +1,6 @@
 import { MCPServer } from "mcp-use";
 import { z } from "zod";
-import { audit, normalise, CATEGORY_SEVERITY, SCORE_GUIDE, verdictFor } from "./src/rules.js";
+import { audit, normalise, CATEGORY_SEVERITY, SCORE_GUIDE, verdictFor, confidenceFor } from "./src/rules.js";
 
 const server = new MCPServer({
   name: "truequill",
@@ -86,6 +86,8 @@ const checkTextOutputSchema = z.object({
   capped: z.boolean().describe("True when the daily cap was hit"),
   upgradeUrl: z.string().optional().describe("Upgrade URL, present when capped"),
   verdict: z.string().describe("Plain-language overall verdict"),
+  confidence: z.enum(["Low", "Moderate", "High"]).describe("Confidence that the text is AI-generated, from strong-signal count"),
+  strongSignals: z.number().describe("How many strong-signal categories fired"),
   scoreGuide: z.string().describe("What the score ranges mean"),
 });
 
@@ -124,6 +126,8 @@ export const checkText = server.tool(
         capped: true,
         upgradeUrl: UPGRADE_URL,
         verdict: "Daily limit reached — upgrade to Pro for unlimited checks.",
+        confidence: "Low" as const,
+        strongSignals: 0,
         scoreGuide: SCORE_GUIDE,
       };
       return {
@@ -145,9 +149,11 @@ export const checkText = server.tool(
       severity: CATEGORY_SEVERITY[c.name],
       points: c.matched ? 1 : 0,
     }));
+    const strongCount = withSeverity.filter((c) => c.matched && c.severity === "strong").length;
     const verdict = verdictFor(
       result.score,
-      withSeverity.some((c) => c.matched && c.severity === "strong")
+      strongCount > 0,
+      strongCount
     );
     const data = {
       score: result.score,
@@ -155,13 +161,15 @@ export const checkText = server.tool(
       categories: withSeverity,
       capped: false,
       verdict,
+      confidence: confidenceFor(strongCount),
+      strongSignals: strongCount,
       scoreGuide: SCORE_GUIDE,
     };
     const failed = result.categories.filter((c) => c.matched).map((c) => c.name);
     const summary =
       result.score === 5
         ? `TrueQuill: 5/5 CLEAN. ${verdict}`
-        : `TrueQuill: ${result.score}/5 — flagged: ${failed.join(", ") || "none"}. ${verdict}`;
+        : `TrueQuill: ${result.score}/5 (confidence: ${confidenceFor(strongCount)}) — flagged: ${failed.join(", ") || "none"}. ${verdict}`;
     return {
       content: [{ type: "text" as const, text: summary }],
       structuredContent: data,

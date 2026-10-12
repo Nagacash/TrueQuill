@@ -120,6 +120,7 @@ export default function CheckResult() {
   const categories = output.categories ?? [];
   const upgradeUrl = output.upgradeUrl ?? PRO_URL;
   const verdict = typeof output.verdict === "string" ? output.verdict : "";
+  const confidence = typeof output.confidence === "string" ? output.confidence : "";
 
   const needles = useMemo(() => {
     const list: string[] = [];
@@ -194,6 +195,11 @@ export default function CheckResult() {
               ))}
             </ul>
             {verdict && <p className="tq-verdict">{verdict}</p>}
+            {confidence && (
+              <p className="tq-conf">
+                AI-likelihood confidence: <strong>{confidence}</strong>
+              </p>
+            )}
             {draft && <HighlightedDraft text={draft} needles={needles} />}
             {categories.some((c) => c.matched) && (
               <ul className="tq-matches">
