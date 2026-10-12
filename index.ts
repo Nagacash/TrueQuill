@@ -96,7 +96,7 @@ export const checkText = server.tool(
     name: "check_text",
     title: "Check text for AI tells",
     description:
-      "Score pasted text for AI-writing tells across 5 categories (vocabulary, sentence patterns, punctuation, three-item lists, unsupported proof). Returns a score out of 5. Capped at 10 checks/day; when capped, returns capped:true with the Pro upgrade URL.",
+      "Score pasted text for AI-writing tells across 5 categories (vocabulary, sentence patterns, punctuation, three-item lists, unsupported proof). Returns a score out of 5. Capped at 10 checks/day; when capped, returns capped:true with the Pro upgrade URL. Always lead your answer with the verdict and confidence lines verbatim, then the score — do not paraphrase them away.",
     inputSchema: checkTextInputSchema,
     outputSchema: checkTextOutputSchema,
     view: {
