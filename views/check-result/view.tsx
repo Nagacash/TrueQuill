@@ -1,4 +1,4 @@
-import { ModelContext, ThemeProvider, useHostContext, useOpenExternal, useToolContext } from "mcp-use/react";
+import { Image, ModelContext, ThemeProvider, useHostContext, useOpenExternal, useToolContext } from "mcp-use/react";
 import { useMemo } from "react";
 import "./view.css";
 
@@ -76,7 +76,10 @@ export default function CheckResult() {
       <ThemeProvider>
         <div className="tq-card" aria-busy="true">
           <div className="tq-head">
-            <span className="tq-brand">TrueQuill</span>
+            <span className="tq-brand">
+              <Image src="/logo.png" alt="TrueQuill logo" className="tq-logo" />
+              TrueQuill
+            </span>
             <span className="tq-score skeleton">…</span>
           </div>
           <div className="tq-skeleton-line" />
@@ -94,7 +97,10 @@ export default function CheckResult() {
       <ThemeProvider>
         <div className="tq-card">
           <div className="tq-head">
-            <span className="tq-brand">TrueQuill</span>
+            <span className="tq-brand">
+              <Image src="/logo.png" alt="TrueQuill logo" className="tq-logo" />
+              TrueQuill
+            </span>
           </div>
           <p role="alert" className="tq-error">
             {view.error.message}
@@ -132,7 +138,10 @@ export default function CheckResult() {
         {!capped && <ModelContext content={`TrueQuill score: ${score}/5${categories.filter((c) => c.matched).map((c) => `; flagged ${c.name}`).join("")}`} />}
         {capped && <ModelContext content="TrueQuill daily cap reached; user should upgrade to Pro." />}
         <div className="tq-head">
-          <span className="tq-brand">TrueQuill</span>
+          <span className="tq-brand">
+            <Image src="/logo.png" alt="TrueQuill logo" className="tq-logo" />
+            TrueQuill
+          </span>
           {capped ? (
             <span className="tq-score capped">capped</span>
           ) : (

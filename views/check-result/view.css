@@ -24,6 +24,15 @@
   font-weight: 700;
   font-size: 16px;
   letter-spacing: 0.01em;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.tq-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 .tq-score {
   font-variant-numeric: tabular-nums;

@@ -12,6 +12,11 @@ const server = new MCPServer({
   websiteUrl: "https://www.nagacodex.cloud/",
   icons: [
     {
+      src: "logo.png",
+      mimeType: "image/png",
+      sizes: ["860x1024"],
+    },
+    {
       src: "icon.svg",
       mimeType: "image/svg+xml",
       sizes: ["512x512"],
