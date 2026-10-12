@@ -1,0 +1,165 @@
+.tq-card {
+  border: 1px solid #e4e4e7;
+  border-radius: 16px;
+  padding: 16px;
+  background: #fff;
+  color: #18181b;
+  font-family: system-ui, -apple-system, sans-serif;
+  max-width: 480px;
+}
+@media (prefers-color-scheme: dark) {
+  .tq-card {
+    background: #09090b;
+    color: #f4f4f5;
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+}
+.tq-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.tq-brand {
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+}
+.tq-score {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 20px;
+}
+.tq-score.capped {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+.tq-score.skeleton {
+  background: #e4e4e7;
+  border-radius: 8px;
+  color: transparent;
+}
+.tq-dial {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 12px;
+}
+.tq-pip {
+  width: 22px;
+  height: 8px;
+  border-radius: 4px;
+  background: #e4e4e7;
+}
+.tq-pip.on {
+  background: #16a34a;
+}
+.tq-dial-label {
+  margin-left: 8px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+.tq-cats {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tq-cat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.tq-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #16a34a;
+  flex: none;
+}
+.tq-cat.hit .tq-dot {
+  background: #dc2626;
+}
+.tq-cat-name {
+  flex: 1;
+}
+.tq-cat-state {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+}
+.tq-draft {
+  font-size: 13px;
+  line-height: 1.5;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 0 0 8px;
+}
+.tq-hit {
+  background: rgba(220, 38, 38, 0.18);
+  border-radius: 3px;
+  padding: 0 1px;
+}
+.tq-matches {
+  font-size: 12px;
+  opacity: 0.85;
+  margin: 0 0 8px;
+  padding-left: 16px;
+}
+.tq-upgrade {
+  border: 1px dashed currentColor;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+.tq-upgrade-title {
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+.tq-upgrade-body {
+  font-size: 13px;
+  margin: 0 0 10px;
+}
+.tq-button {
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 16px;
+  background: #18181b;
+  color: #fff;
+  font-size: 14px;
+}
+.tq-foot {
+  font-size: 11px;
+  opacity: 0.6;
+  margin: 8px 0 0;
+}
+.tq-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  color: inherit;
+  font-size: inherit;
+}
+.tq-error {
+  color: #dc2626;
+  font-size: 13px;
+}
+.tq-skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  background: #e4e4e7;
+  margin-bottom: 8px;
+}
+.tq-skeleton-line.short {
+  width: 60%;
+}
